@@ -15,8 +15,9 @@ public class Server {
 	}
 
 	@GetMapping("/")
-	public String matrix(@RequestParam(value = "name", defaultValue = "World") String name) {
-		return String.format("<h1>Hello %s </h1>", name);
+	public String index() {
+		return "<h1>PokeAIJava Home Page!<h1>";
 	}
+
 
 }
