@@ -62,9 +62,17 @@ public class Move {
         cutArr = PokeUtils.stringSplit(cutString, ",");
         String type = PokeUtils.stringSplit(cutArr.get(0), "\"name\":\"").get(1);
         type = type.substring(0, type.length() - 1);
+        System.out.println("MoveBefore: " + type);
         if (type.equals("electric")) {
             this.pokeType = PokeType.ELECTRIC;
+        } else if (type.equals("water")) {
+            this.pokeType = PokeType.WATER;
+        } else if (type.equals("ghost")) {
+            this.pokeType = PokeType.GHOST;
+        } else if (type.equals("normal")) {
+            this.pokeType = PokeType.NORMAL;
         }
+        System.out.println("Move: " + this.pokeType);
         // Damage Class
         String effectString = PokeUtils.stringSplit(result.toString(), "\"damage_class\"").get(1);
         cutArr = PokeUtils.stringSplit(effectString, ",");

@@ -41,7 +41,7 @@ public class Pokemon {
     public final Move[] moves = new Move[4];
     public String name;
     public float health, attack, specialAttack, defense, specialDefense, speed;
-    public PokeType type;
+    public PokeType type, secondType;
 
     public Pokemon(Pokemon pokemon) {
         if (pokemon.moves[0] != null) {
@@ -92,7 +92,25 @@ public class Pokemon {
         statsString = statsString.substring(0, statsString.indexOf("]") + 1);
         this.setStats(statsString);
         this.name = name;
-
+        String cutString = PokeUtils.stringSplit(result.toString(), "\"type\":").get(1);
+        ArrayList<String> cutArr = PokeUtils.stringSplit(cutString, "\"name\":\"");
+        String firsType = PokeUtils.stringSplit(cutArr.get(1), "\"").get(0);
+        if (firsType.equals("electric")) {
+            this.type = PokeType.ELECTRIC;
+        } else if (firsType.equals("water")) {
+            this.type = PokeType.WATER;
+        }
+        try {
+            cutArr = PokeUtils.stringSplit(PokeUtils.stringSplit(cutArr.get(1), "\"type\"").get(1), "\"name\":\"");
+            String secondType = PokeUtils.stringSplit(cutArr.get(1), "\"").get(0);
+            if (secondType.equals("electric")) {
+                this.secondType = PokeType.ELECTRIC;
+            } else if (secondType.equals("water")) {
+                this.secondType = PokeType.WATER;
+            }
+        } catch (IndexOutOfBoundsException exception) {
+            this.secondType = null;
+        }
     }
 
     private void setStats(String statsString) {

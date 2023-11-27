@@ -7,7 +7,6 @@ public class PokeUtils {
         ArrayList<String> result = new ArrayList<>();
         int index = string.indexOf(delimiter);
         if (index == -1) {
-            System.out.println("Index out of range for split.");
             throw new IndexOutOfBoundsException();
         }
         if (index == 0) {
