@@ -42,6 +42,8 @@ public class MatrixController {
                 }
                 System.out.println();
             }
+
+            ServerResponse serverResponse = new ServerResponse()
             if(serverRequest.getAlgorithm() == AlgorithmEnum.ASTAR) {
                 System.out.println("AStar!");
                 Astar astar = new Astar();
