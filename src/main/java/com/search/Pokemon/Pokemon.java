@@ -91,23 +91,17 @@ public class Pokemon {
         String statsString = result.substring(startIndex);
         statsString = statsString.substring(0, statsString.indexOf("]") + 1);
         this.setStats(statsString);
-        this.name = name;
+        char[] nameChars = name.toCharArray();
+        nameChars[0] = Character.toUpperCase(nameChars[0]);
+        this.name = new String(nameChars);
         String cutString = PokeUtils.stringSplit(result.toString(), "\"type\":").get(1);
         ArrayList<String> cutArr = PokeUtils.stringSplit(cutString, "\"name\":\"");
         String firsType = PokeUtils.stringSplit(cutArr.get(1), "\"").get(0);
-        if (firsType.equals("electric")) {
-            this.type = PokeType.ELECTRIC;
-        } else if (firsType.equals("water")) {
-            this.type = PokeType.WATER;
-        }
+        this.type = PokeUtils.determinePokeType(firsType);
         try {
             cutArr = PokeUtils.stringSplit(PokeUtils.stringSplit(cutArr.get(1), "\"type\"").get(1), "\"name\":\"");
             String secondType = PokeUtils.stringSplit(cutArr.get(1), "\"").get(0);
-            if (secondType.equals("electric")) {
-                this.secondType = PokeType.ELECTRIC;
-            } else if (secondType.equals("water")) {
-                this.secondType = PokeType.WATER;
-            }
+            this.secondType = PokeUtils.determinePokeType(secondType);
         } catch (IndexOutOfBoundsException exception) {
             this.secondType = null;
         }

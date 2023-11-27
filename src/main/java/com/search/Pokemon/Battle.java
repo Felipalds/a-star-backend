@@ -8,12 +8,13 @@ public class Battle {
     public static class PokeStatus {
         public float health, speed, attack, specialAttack, defense, specialDefense;
         public String name;
-        public PokeType pokeType;
+        public PokeType pokeType, secondPokeType;
         public DamageType damageType;
         // Battle Conditions
         public boolean fainted = false;
 
         public PokeStatus(Pokemon pokemon) {
+            this.name = pokemon.name;
             this.health = pokemon.health;
             this.speed = pokemon.speed;
             this.specialAttack = pokemon.specialAttack;
@@ -21,9 +22,11 @@ public class Battle {
             this.attack = pokemon.attack;
             this.defense = pokemon.defense;
             this.pokeType = pokemon.type;
+            this.secondPokeType = pokemon.secondType;
         }
 
         public PokeStatus(PokeStatus pokeStatus) {
+            this.name = pokeStatus.name;
             this.health = pokeStatus.health;
             this.speed = pokeStatus.speed;
             this.specialAttack = pokeStatus.specialAttack;
@@ -36,6 +39,7 @@ public class Battle {
 
     public Pokemon pokemonA, pokemonB;
     public PokeStatus statusA, statusB;
+    public int turn = 0;
 
     public Battle(Pokemon pokemonA, Pokemon pokemonB) {
         this.pokemonA = new Pokemon(pokemonA);
@@ -200,7 +204,7 @@ public class Battle {
                 }
                 return 1f;
             default:
-                return -1f;
+                return 1f;
 
         }
     }
@@ -220,41 +224,71 @@ public class Battle {
             stab = 1.5f;
         }
         float te = getTypeEffectiveness(move.pokeType, statusTarget.pokeType);
-        float damage = ((2f * move.power * (attack / defense)) / 50f + 2) * stab * te *1.125f;
-        System.out.println("((2*"+move.power+"*"+"("+attack+"/"+defense+"))/50f+2)*"+stab+"*"+te);
+        float te2 = getTypeEffectiveness(move.pokeType, statusTarget.secondPokeType);
+        float damage = ((2f * move.power * (attack / defense)) / 50f + 2) * stab * te * te2 * 1.125f;
+        System.out.println(statusAttacker.name + " usou " + move.name + "!");
+        System.out.println(statusTarget.name + " recebe " + damage + " de dano!");
+
+        float previousHealth = statusTarget.health;
+
         statusTarget.health -= damage;
         if (statusTarget.health <= 0) {
             statusTarget.health = 0;
             statusTarget.fainted = true;
         }
+
+        if (te == 2f && te2 == 2f) {
+            System.out.println("Super efetivo! x4");
+        } else if (te == 2f || te2 == 2f) {
+            System.err.println("Super efetivo! x2");
+        } else if (te == 0.5f && te2 == 0.5f) {
+            System.err.println("Oponente resiste ao ataque! x0.25");
+        } else if (te == 0.5f || te2 == 0.5f) {
+            System.err.println("Oponente resiste ao ataque! x0.5");
+        } else if (te == 0f || te2 == 0f) {
+            System.err.println("Sem efeito no oponente! x0");
+        }
+        System.out.println("HP: " + previousHealth + " -> " + statusTarget.health);
+        if (statusTarget.health <= 0) {
+            System.err.println("Oponente caiu!");
+        }
+        System.err.println("=================\n");
     }
 
     // Move A is for pokemon A and B for pokemon B...
     public Battle makeTurn(int moveA, int moveB) {
         Battle nextTurn = new Battle(pokemonA, pokemonB);
+        nextTurn.turn = this.turn + 1;
         nextTurn.statusA = new PokeStatus(statusA);
         nextTurn.statusB = new PokeStatus(statusB);
-        System.err.println(nextTurn.statusA.pokeType);
+        System.err.println("=== Turno [" + this.turn + "] ===\n");
+        if (statusA.fainted == true) {
+            System.err.println("Oponente A vitorioso.");
+            return this;
+        } else if (statusB.fainted == true) {
+            System.err.println("Oponente B vitorioso");
+            return this;
+        }
         // Calculate result
-        if (pokemonA.moves[moveA].priority > pokemonA.moves[moveB].priority) {
+        if (pokemonA.moves[moveA].priority > pokemonB.moves[moveB].priority) {
             applyMove(nextTurn.statusA, nextTurn.statusB, pokemonA.moves[moveA]);
-            if (statusB.fainted == false) {
+            if (nextTurn.statusB.fainted == false) {
                 applyMove(nextTurn.statusB, nextTurn.statusA, pokemonB.moves[moveB]);
             }
-        } else if (pokemonA.moves[moveA].priority < pokemonA.moves[moveB].priority) {
+        } else if (pokemonA.moves[moveA].priority < pokemonB.moves[moveB].priority) {
             applyMove(nextTurn.statusB, nextTurn.statusA, pokemonB.moves[moveB]);
-            if (statusB.fainted == false) {
+            if (nextTurn.statusB.fainted == false) {
                 applyMove(nextTurn.statusA, nextTurn.statusB, pokemonA.moves[moveA]);
             }
         } else {
             if (pokemonA.speed > pokemonB.speed) {
                 applyMove(nextTurn.statusA, nextTurn.statusB, pokemonA.moves[moveA]);
-                if (statusB.fainted == false) {
+                if (nextTurn.statusB.fainted == false) {
                     applyMove(nextTurn.statusB, nextTurn.statusA, pokemonB.moves[moveB]);
                 }
             } else if (pokemonA.speed <= pokemonB.speed) {
                 applyMove(nextTurn.statusB, nextTurn.statusA, pokemonB.moves[moveB]);
-                if (statusB.fainted == false) {
+                if (nextTurn.statusB.fainted == false) {
                     applyMove(nextTurn.statusA, nextTurn.statusB, pokemonA.moves[moveA]);
                 }
             }
