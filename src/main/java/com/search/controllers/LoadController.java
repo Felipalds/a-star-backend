@@ -65,7 +65,7 @@ public class LoadController {
     }
 
     private static class LoadMove {
-        private String name;
+        private String name, description;
         private int power;
 
         public void setName(String name) {
@@ -83,6 +83,14 @@ public class LoadController {
         public int getPower() {
             return power;
         }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
     }
 
     private static LoadPokemon PokemonToLoad(Pokemon pokemon) {
@@ -99,6 +107,7 @@ public class LoadController {
         LoadMove loadMove = new LoadMove();
         loadMove.setName(move.name);
         loadMove.setPower((int) move.power);
+        loadMove.setDescription(move.description);
         return loadMove;
     }
 
