@@ -5,41 +5,30 @@ import com.search.pokejava.Pokemon;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 @RestController
 public class LoadController {
 
     private static class LoadJson {
-        private ArrayList<LoadPokemon> loadPokemons = new ArrayList<>();
-        private ArrayList<LoadMove> loadMoves = new ArrayList<>();
+        private final ArrayList<LoadPokemon> pokemons = new ArrayList<>();
 
-        public void setLoadPokemons(ArrayList<LoadPokemon> loadPokemons) {
-            this.loadPokemons = loadPokemons;
+
+        public ArrayList<LoadPokemon> getPokemons() {
+            return pokemons;
         }
 
-        public void setLoadMoves(ArrayList<LoadMove> loadMoves) {
-            this.loadMoves = loadMoves;
-        }
-
-        public ArrayList<LoadPokemon> getLoadPokemons() {
-            return loadPokemons;
-        }
-
-        public ArrayList<LoadMove> getLoadMoves() {
-            return loadMoves;
-        }
     }
 
     private static class LoadPokemon {
 
         private String name, type;
         private int health;
-        private ArrayList<String> imagesList = new ArrayList<>();
+        private final ArrayList<String> sprites = new ArrayList<>();
+        private final ArrayList<LoadMove> moves = new ArrayList<>();
+
 
         public String getName() {
             return name;
@@ -49,20 +38,16 @@ public class LoadController {
             this.name = name;
         }
 
-        public ArrayList<String> getImagesList() {
-            return imagesList;
-        }
-
         public void setHealth(int health) {
             this.health = health;
         }
 
-        public void setImagesList(ArrayList<String> imagesList) {
-            this.imagesList = imagesList;
-        }
-
         public void setType(String type) {
             this.type = type;
+        }
+
+        public ArrayList<String> getSprites() {
+            return sprites;
         }
 
         public String getType() {
@@ -71,6 +56,10 @@ public class LoadController {
 
         public int getHealth() {
             return health;
+        }
+
+        public ArrayList<LoadMove> getMoves() {
+            return moves;
         }
     }
 
@@ -95,26 +84,37 @@ public class LoadController {
         }
     }
 
+    private static LoadPokemon PokemonToLoad(Pokemon pokemon) {
+        LoadPokemon loadPokemon = new LoadPokemon();
+        loadPokemon.setName(pokemon.name);
+        loadPokemon.setHealth((int) pokemon.health);
+        loadPokemon.setType(pokemon.type.toString());
+        loadPokemon.sprites.add(pokemon.imageFront);
+        loadPokemon.sprites.add(pokemon.imageBack);
+        return loadPokemon;
+    }
 
+    private static LoadMove MoveToLoad(Move move) {
+        LoadMove loadMove = new LoadMove();
+        loadMove.setName(move.name);
+        loadMove.setPower((int) move.power);
+        return loadMove;
+    }
 
     @CrossOrigin()
-    @GetMapping(value = "/start", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/load", produces = MediaType.APPLICATION_JSON_VALUE)
     private LoadJson load() {
         LoadJson startJson = new LoadJson();
-        LoadPokemon loadPikachu = new LoadPokemon();
-        Pokemon pikachu = new Pokemon("pikachu");
-        loadPikachu.setHealth((int) pikachu.health);
-        loadPikachu.setName(pikachu.name);
-        loadPikachu.setType(pikachu.type.toString());
-        loadPikachu.imagesList.add(pikachu.imageFront);
-        loadPikachu.imagesList.add(pikachu.imageBack);
-        startJson.loadPokemons.add(loadPikachu);
-        Move thunderShock = new Move("thunder-shock");
-        LoadMove loadThunderShock = new LoadMove();
-        loadThunderShock.setName(thunderShock.name);
-        loadThunderShock.setPower((int) thunderShock.power);
-        startJson.loadMoves.add(loadThunderShock);
-
+        // Pikachu
+        LoadPokemon pikachu = PokemonToLoad(new Pokemon("pikachu"));
+        pikachu.moves.add(MoveToLoad(new Move("thunder-shock")));
+        startJson.pokemons.add(pikachu);
+        // Bulbasaur
+        startJson.pokemons.add(PokemonToLoad(new Pokemon("bulbasaur")));
+        startJson.pokemons.add(PokemonToLoad(new Pokemon("squirtle")));
+        startJson.pokemons.add(PokemonToLoad(new Pokemon("charmander")));
+        startJson.pokemons.add(PokemonToLoad(new Pokemon("clefairy")));
+        startJson.pokemons.add(PokemonToLoad(new Pokemon("snorlax")));
         return startJson;
     }
 
