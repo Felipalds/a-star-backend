@@ -6,6 +6,66 @@ import com.search.pokejava.types.PokeType;
 public class Battle {
 
     public static class PokeStatus {
+        public float getHealth() {
+            return health;
+        }
+
+        public float getSpeed() {
+            return speed;
+        }
+
+        public float getAttack() {
+            return attack;
+        }
+
+        public float getSpecialAttack() {
+            return specialAttack;
+        }
+
+        public float getDefense() {
+            return defense;
+        }
+
+        public float getSpecialDefense() {
+            return specialDefense;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public PokeType getPokeType() {
+            return pokeType;
+        }
+
+        public PokeType getSecondPokeType() {
+            return secondPokeType;
+        }
+
+        public int getSpeedStage() {
+            return speedStage;
+        }
+
+        public int getAttackStage() {
+            return attackStage;
+        }
+
+        public int getSpAttackStage() {
+            return spAttackStage;
+        }
+
+        public int getDefenseStage() {
+            return defenseStage;
+        }
+
+        public int getSpDefenseStage() {
+            return spDefenseStage;
+        }
+
+        public boolean isFainted() {
+            return fainted;
+        }
+
         public float health, speed, attack, specialAttack, defense, specialDefense;
         public String name;
         public PokeType pokeType, secondPokeType;

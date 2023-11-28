@@ -1,5 +1,6 @@
 package com.search.controllers;
 
+import com.search.pokejava.Battle;
 import com.search.pokejava.Move;
 import com.search.pokejava.Pokemon;
 import org.springframework.http.MediaType;

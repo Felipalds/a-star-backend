@@ -8,13 +8,15 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.pokejava.types.DamageType;
 import com.search.pokejava.types.PokeType;
 
 public class Move {
-    public String name;
+    public String name, description;
     public int priority;
     public float power;
     public DamageType damageType;
@@ -28,6 +30,7 @@ public class Move {
         this.damageType = move.damageType;
         this.pokeType = move.pokeType;
         this.effect = move.effect;
+        this.description = move.description;
     }
 
     public Move(String name) {
@@ -51,44 +54,45 @@ public class Move {
             System.out.println("Erro na requisição.");
             System.exit(2);
         }
-        // Damage Class
-        String effectString = PokeUtils.stringSplit(result.toString(), "\"damage_class\"").get(1);
-        ArrayList<String> cutArr = PokeUtils.stringSplit(effectString, ",");
-        String type = PokeUtils.stringSplit(cutArr.get(0), ":{\"name\":\"").get(1);
-        type = type.substring(0, type.length() - 1);
-        if (type.equals("physical")) {
-            this.damageType = DamageType.PHYSICAL;
-        } else if (type.equals("special")) {
-            this.damageType = DamageType.SPECIAL;
-        } else if (type.equals("status")) {
-            this.damageType = DamageType.STATUS;
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode resultMap;
+
+        try {
+            resultMap = mapper.readTree(result.toString());
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
+
+        // Damage Class
+        switch (resultMap.get("damage_class").get("name").asText()) {
+            case "physical":
+                this.damageType = DamageType.PHYSICAL;
+                break;
+            case "special":
+                this.damageType = DamageType.SPECIAL;
+                break;
+            default:
+                this.damageType = DamageType.STATUS;
+        }
+
+        // Description
+        JsonNode effectNode = resultMap.get("effect_entries").get(0).get("effect");
+        this.description = effectNode.asText();
 
         // Effect
-        try {
-            effectString = PokeUtils.stringSplit(result.toString(), "\"effect_entries\":[{\"effect\":\"").get(1);
-            cutArr = PokeUtils.stringSplit(effectString, "\"");
-            this.effect = Effect.identifyEffect(cutArr.get(0));
-        } catch (IndexOutOfBoundsException exception) {
-            this.effect = null;
-        }
-        // Power
-        String cutString = PokeUtils.stringSplit(result.toString(), "\"power\":").get(1);
-        cutArr = PokeUtils.stringSplit(cutString, ",");
-        if (damageType != DamageType.STATUS) {
-            this.power = Float.parseFloat(cutArr.get(0));
-        }
-        // Priority
-        cutString = PokeUtils.stringSplit(cutArr.get(1), "\"priority\":").get(1);
-        cutArr = PokeUtils.stringSplit(cutString, ",");
-        this.priority = Integer.parseInt(cutArr.get(0));
-        // Type
-        cutString = PokeUtils.stringSplit(cutArr.get(1), "\"type\":").get(1);
-        cutArr = PokeUtils.stringSplit(cutString, ",");
-        type = PokeUtils.stringSplit(cutArr.get(0), "\"name\":\"").get(1);
-        type = type.substring(0, type.length() - 1);
-        this.pokeType = PokeUtils.determinePokeType(type);
+        this.effect = Effect.identifyEffect(effectNode.asText());
 
+        // Power
+        this.power = resultMap.get("power").asInt();
+
+        // Priority
+        this.priority = resultMap.get("priority").asInt();
+
+        // Type
+        this.pokeType = PokeUtils.determinePokeType(resultMap.get("type").get("name").asText());
+
+        // Capitalize
         char[] nameChars = name.toCharArray();
         nameChars[0] = Character.toUpperCase(nameChars[0]);
         this.name = new String(nameChars);
