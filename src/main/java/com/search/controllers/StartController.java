@@ -13,7 +13,7 @@ import java.util.Map;
 @RestController
 public class StartController {
 
-    @CrossOrigin()
+    @CrossOrigin(origins = "http://localhost:5173")
     @PostMapping(value = "/start", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> start(@RequestBody Map<String, Object> payload) {
         return new ResponseEntity<>("", HttpStatus.OK);
