@@ -3,6 +3,8 @@ package com.search.controllers;
 import com.search.pokejava.Battle;
 import com.search.pokejava.Move;
 import com.search.pokejava.Pokemon;
+import com.search.pokejava.types.DamageType;
+import com.search.pokejava.types.PokeType;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -66,6 +68,8 @@ public class LoadController {
 
     private static class LoadMove {
         private String name, description;
+        private PokeType pokeType;
+        private DamageType damageType;
         private int power;
 
         public void setName(String name) {
@@ -91,6 +95,22 @@ public class LoadController {
         public void setDescription(String description) {
             this.description = description;
         }
+
+        public PokeType getPokeType() {
+            return pokeType;
+        }
+
+        public void setPokeType(PokeType pokeType) {
+            this.pokeType = pokeType;
+        }
+
+        public DamageType getDamageType() {
+            return damageType;
+        }
+
+        public void setDamageType(DamageType damageType) {
+            this.damageType = damageType;
+        }
     }
 
     private static LoadPokemon PokemonToLoad(Pokemon pokemon) {
@@ -108,6 +128,8 @@ public class LoadController {
         loadMove.setName(move.name);
         loadMove.setPower((int) move.power);
         loadMove.setDescription(move.description);
+        loadMove.setPokeType(move.pokeType);
+        loadMove.setDamageType(move.damageType);
         return loadMove;
     }
 
