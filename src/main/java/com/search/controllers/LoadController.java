@@ -105,16 +105,39 @@ public class LoadController {
     @GetMapping(value = "/load", produces = MediaType.APPLICATION_JSON_VALUE)
     private LoadJson load() {
         LoadJson startJson = new LoadJson();
+        LoadMove tackle = MoveToLoad(new Move("tackle"));
+        LoadMove thunderShock = MoveToLoad(new Move("thunder-shock"));
+        LoadMove ember = MoveToLoad(new Move("ember"));
+        LoadMove earthquake = MoveToLoad(new Move("earthquake"));
+        LoadMove sharpen = MoveToLoad(new Move("sharpen"));
         // Pikachu
         LoadPokemon pikachu = PokemonToLoad(new Pokemon("pikachu"));
-        pikachu.moves.add(MoveToLoad(new Move("thunder-shock")));
+        pikachu.moves.add(thunderShock);
+        pikachu.moves.add(tackle);
         startJson.pokemons.add(pikachu);
         // Bulbasaur
-        startJson.pokemons.add(PokemonToLoad(new Pokemon("bulbasaur")));
-        startJson.pokemons.add(PokemonToLoad(new Pokemon("squirtle")));
-        startJson.pokemons.add(PokemonToLoad(new Pokemon("charmander")));
-        startJson.pokemons.add(PokemonToLoad(new Pokemon("clefairy")));
-        startJson.pokemons.add(PokemonToLoad(new Pokemon("snorlax")));
+        LoadPokemon bulbasaur = PokemonToLoad(new Pokemon("bulbasaur"));
+        bulbasaur.moves.add(tackle);
+//        bulbasaur.moves.add(MoveToLoad(new Move("quick-attack")));
+        startJson.pokemons.add(bulbasaur);
+        // Squirtle
+        LoadPokemon squirtle = PokemonToLoad(new Pokemon("squirtle"));
+        squirtle.moves.add(tackle);
+        startJson.pokemons.add(squirtle);
+        // Charmander
+        LoadPokemon charmander = PokemonToLoad(new Pokemon("charmander"));
+        charmander.moves.add(tackle);
+        charmander.moves.add(ember);
+        charmander.moves.add(sharpen);
+        startJson.pokemons.add(charmander);
+        // Clefairy
+        LoadPokemon clefairy = PokemonToLoad(new Pokemon("clefairy"));
+        clefairy.moves.add(tackle);
+        startJson.pokemons.add(clefairy);
+        // Snorlax
+        LoadPokemon snorlax = PokemonToLoad(new Pokemon("snorlax"));
+        startJson.pokemons.add(snorlax);
+        snorlax.moves.add(earthquake);
         return startJson;
     }
 
