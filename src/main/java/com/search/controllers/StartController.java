@@ -28,8 +28,6 @@ public class StartController {
         Pokemon userPokemon, aiPokemon;
         userPokemon = new Pokemon((String) payload.get("userPokemon"));
         aiPokemon = new Pokemon((String) payload.get("aiPokemon"));
-        aiPokemon.moves[0] = new Move("thunder-shock");
-        userPokemon.moves[0] = new Move("quick-attack");
         Battle battle = new Battle(userPokemon, aiPokemon);
         Map<String, Battle.PokeStatus> map = new HashMap<>();
         map.put("userPokemon", battle.statusA);

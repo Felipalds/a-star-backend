@@ -15,13 +15,14 @@ import java.util.Map;
 @RestController
 public class RoundController {
     private static class RoundResponse {
+        private Battle.PokeStatus statusA, statusB;
+
 
     }
 
     @CrossOrigin()
     @PostMapping(value = "/round", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<RoundResponse> round(@RequestBody Map<String, Object> payload) {
-
         RoundResponse roundResponse = new RoundResponse();
         return new ResponseEntity<>(roundResponse, HttpStatus.OK);
     }
