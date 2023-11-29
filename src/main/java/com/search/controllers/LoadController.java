@@ -1,6 +1,5 @@
 package com.search.controllers;
 
-import com.search.pokejava.Battle;
 import com.search.pokejava.Move;
 import com.search.pokejava.Pokemon;
 import com.search.pokejava.types.DamageType;
@@ -17,8 +16,6 @@ public class LoadController {
 
     private static class LoadJson {
         private final ArrayList<LoadPokemon> pokemons = new ArrayList<>();
-
-
         public ArrayList<LoadPokemon> getPokemons() {
             return pokemons;
         }
@@ -27,8 +24,7 @@ public class LoadController {
 
     private static class LoadPokemon {
 
-        private String name, type;
-        private int health;
+        private String name, type, secondType;
         private final ArrayList<String> sprites = new ArrayList<>();
         private final ArrayList<LoadMove> moves = new ArrayList<>();
 
@@ -39,10 +35,6 @@ public class LoadController {
 
         public void setName(String name) {
             this.name = name;
-        }
-
-        public void setHealth(int health) {
-            this.health = health;
         }
 
         public void setType(String type) {
@@ -57,12 +49,17 @@ public class LoadController {
             return type;
         }
 
-        public int getHealth() {
-            return health;
-        }
 
         public ArrayList<LoadMove> getMoves() {
             return moves;
+        }
+
+        public String getSecondType() {
+            return secondType;
+        }
+
+        public void setSecondType(String secondType) {
+            this.secondType = secondType;
         }
     }
 
@@ -111,13 +108,18 @@ public class LoadController {
         public void setDamageType(DamageType damageType) {
             this.damageType = damageType;
         }
+
     }
 
     private static LoadPokemon PokemonToLoad(Pokemon pokemon) {
         LoadPokemon loadPokemon = new LoadPokemon();
         loadPokemon.setName(pokemon.name);
-        loadPokemon.setHealth((int) pokemon.health);
         loadPokemon.setType(pokemon.type.toString());
+        if (loadPokemon.secondType == null) {
+            loadPokemon.setSecondType(null);
+        } else {
+            loadPokemon.setSecondType(pokemon.secondType.toString());
+        }
         loadPokemon.sprites.add(pokemon.imageFront);
         loadPokemon.sprites.add(pokemon.imageBack);
         return loadPokemon;
@@ -132,8 +134,7 @@ public class LoadController {
         loadMove.setDamageType(move.damageType);
         return loadMove;
     }
-
-    @CrossOrigin()
+    @CrossOrigin(origins = "http://10.81.70.117:5173")
     @GetMapping(value = "/load", produces = MediaType.APPLICATION_JSON_VALUE)
     private LoadJson load() {
         LoadJson startJson = new LoadJson();

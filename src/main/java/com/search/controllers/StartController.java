@@ -22,7 +22,7 @@ import java.util.Map;
 @RestController
 public class StartController {
 
-    @CrossOrigin()
+    @CrossOrigin(origins = "http://10.81.70.117:5173")
     @PostMapping(value = "/start", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Battle.PokeStatus>> start(@RequestBody Map<String, Object> payload) {
         Pokemon userPokemon, aiPokemon;
