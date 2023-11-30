@@ -1,8 +1,11 @@
 package com.search.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.search.ai.AiType;
+import com.search.ai.BFS;
 import com.search.pokejava.Battle;
 import com.search.pokejava.Pokemon;
+import jakarta.annotation.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,12 +30,12 @@ public class RoundController {
             return this.ended;
         }
 
-        public void setStatusUser(Battle.PokeStatus statusUser) {
-            this.statusUser = statusUser;
+        public void setUserStatus(Battle.PokeStatus userStatus) {
+            this.userStatus = userStatus;
         }
 
-        public void setStatusAI(Battle.PokeStatus statusAI) {
-            this.statusAI = statusAI;
+        public void setAiStatus(Battle.PokeStatus aiStatus) {
+            this.aiStatus = aiStatus;
         }
 
         public void setTurn(int turn) {
@@ -51,12 +54,12 @@ public class RoundController {
             this.first = first;
         }
 
-        public Battle.PokeStatus getStatusUser() {
-            return statusUser;
+        public Battle.PokeStatus getUserStatus() {
+            return userStatus;
         }
 
-        public Battle.PokeStatus getStatusAI() {
-            return statusAI;
+        public Battle.PokeStatus getAiStatus() {
+            return aiStatus;
         }
 
         public boolean isEnded() {
@@ -79,7 +82,7 @@ public class RoundController {
             this.aiMove = aiMove;
         }
 
-        private Battle.PokeStatus statusUser, statusAI;
+        private Battle.PokeStatus userStatus, aiStatus;
         private int turn;
         private String aiMove;
         private boolean ended;
@@ -96,8 +99,7 @@ public class RoundController {
         int userMove = (int) payload.get("userMove");
         Pokemon userPokemon = mapper.convertValue(payload.get("userPokemon"), Pokemon.class);
         Pokemon aiPokemon = mapper.convertValue(payload.get("aiPokemon"), Pokemon.class);
-        System.out.println(userPokemon.moves[0]);
-        System.out.println(aiPokemon.moves[0]);
+        AiType aiType = mapper.convertValue(payload.get("algorithm"), AiType.class);
         Battle.PokeStatus userStatus = mapper.convertValue(payload.get("userStatus"), Battle.PokeStatus.class);
         Battle.PokeStatus aiStatus = mapper.convertValue(payload.get("aiStatus"), Battle.PokeStatus.class);
 
@@ -105,23 +107,27 @@ public class RoundController {
         battle.statusA = userStatus;
         battle.statusB = aiStatus;
 
-        Battle newTurn = battle.makeTurn(userMove, 0);
         RoundResponse response = new RoundResponse();
-        response.setEnded(newTurn.ended);
-        if (userPokemon.moves[userMove].priority > aiPokemon.moves[0].priority) {
-            response.setFirst(userPokemon.name);
-        } else if (userPokemon.moves[userMove].priority < aiPokemon.moves[0].priority) {
-            response.setFirst(aiPokemon.name);
-        } else if (userPokemon.speed >= aiPokemon.speed) {
-            response.setFirst(userPokemon.name);
-        } else {
-            response.setFirst(aiPokemon.name);
+        if (aiType == AiType.BFS) {
+            BFS bfs = new BFS(battle);
+            int aiMove = bfs.path.get(1).aiMove;
+            Battle newTurn = battle.makeTurn(userMove, aiMove);
+            response.setEnded(newTurn.ended);
+            if (userPokemon.moves[userMove].priority > aiPokemon.moves[0].priority) {
+                response.setFirst(userPokemon.name);
+            } else if (userPokemon.moves[userMove].priority < aiPokemon.moves[0].priority) {
+                response.setFirst(aiPokemon.name);
+            } else if (userPokemon.speed >= aiPokemon.speed) {
+                response.setFirst(userPokemon.name);
+            } else {
+                response.setFirst(aiPokemon.name);
+            }
+            response.setLogs(newTurn.getLogs());
+            response.setTurn(newTurn.turn);
+            response.setAiStatus(newTurn.statusB);
+            response.setUserStatus(newTurn.statusA);
+            response.setAiMove(aiPokemon.moves[0].name);
         }
-        response.setLogs(newTurn.getLogs());
-        response.setTurn(newTurn.turn);
-        response.setStatusAI(newTurn.statusB);
-        response.setStatusUser(newTurn.statusA);
-        response.setAiMove(aiPokemon.moves[0].name);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

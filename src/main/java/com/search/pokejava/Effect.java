@@ -115,6 +115,10 @@ public abstract class Effect {
         battle.logs.add(target.name + " recebe " + damage + " de dano!");
 
         target.health -= damage;
+        if (target.health <= 0f) {
+            target.health = 0f;
+            target.fainted = true;
+        }
     }
 
     public Effect() {

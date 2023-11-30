@@ -357,7 +357,13 @@ public class Battle {
         }
         if (nextTurn.statusA.fainted || nextTurn.statusB.fainted) {
             nextTurn.logs.add("A batalha encerra!");
-            nextTurn.logs.add(pokemonA.getName() + " é vitorioso!");
+            if (nextTurn.statusA.fainted && !nextTurn.statusB.fainted) {
+                nextTurn.logs.add(pokemonB.getName() + " é vitorioso!");
+            } else if (!nextTurn.statusA.fainted) {
+                nextTurn.logs.add(pokemonA.getName() + " é vitorioso!");
+            } else {
+                nextTurn.logs.add("É um empate!");
+            }
             nextTurn.ended = true;
         }
         return nextTurn;

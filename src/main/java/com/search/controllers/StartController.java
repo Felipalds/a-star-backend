@@ -3,6 +3,8 @@ package com.search.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.Server;
 import com.search.ai.AiType;
+import com.search.ai.BFS;
+import com.search.ai.PokeTree;
 import com.search.pokejava.Battle;
 import com.search.pokejava.Pokemon;
 import org.slf4j.Logger;
@@ -31,7 +33,6 @@ public class StartController {
         try {
             userPokemon = mapper.convertValue(payload.get("userPokemon"), Pokemon.class);
             aiPokemon = mapper.convertValue(payload.get("aiPokemon"), Pokemon.class);
-            AiType aiType = mapper.convertValue(payload.get("algorithm"), AiType.class);
         } catch (Exception exception) {
             System.out.println("Error during conversion of pokemon objects /start.");
             logger.error(exception.toString());
@@ -40,8 +41,8 @@ public class StartController {
             return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
         }
         Map<String, Battle.PokeStatus> map = new HashMap<>();
-        map.put("userPokemon", new Battle.PokeStatus(userPokemon));
-        map.put("aiPokemon", new Battle.PokeStatus(aiPokemon));
+        map.put("userStatus", new Battle.PokeStatus(userPokemon));
+        map.put("aiStatus", new Battle.PokeStatus(aiPokemon));
         return new ResponseEntity<>(map, HttpStatus.OK);
     }
 }

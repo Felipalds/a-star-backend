@@ -14,7 +14,9 @@ public class PokeTree {
     ArrayList<PokeNode> children;
 
     public static class PokeNode {
+        public Battle battle;
         public float userHealth, aiHealth;
+        int level = 0;
         public PokeNode parent;
         public ArrayList<PokeNode> children = new ArrayList<>();
         public int userMove, aiMove;
@@ -23,13 +25,22 @@ public class PokeTree {
             this.aiHealth = battle.statusB.health;
             this.userMove = userMove;
             this.aiMove = aiMove;
+            this.battle = battle;
         }
 
         public void generateChildren() {
             if (children.isEmpty()) {
                 for (int userMove = 0; userMove < 4; userMove++) {
                     for (int aiMove = 0; aiMove < 4; aiMove++) {
-                        children.add(new PokeNode(battle.makeTurn(userMove, aiMove), userMove, aiMove));
+                        if (battle.pokemonA.moves[userMove] != null && battle.pokemonB.moves[aiMove] != null) {
+                            PokeNode pokeNode = new PokeNode(battle.makeTurn(userMove, aiMove), userMove, aiMove);
+                            pokeNode.level = this.level + 1;
+                            pokeNode.parent = this;
+                            children.add(pokeNode);
+                            System.out.println(battle.pokemonA.moves[userMove].name + " " + battle.pokemonB.moves[aiMove].name);
+                            System.out.println(pokeNode.userHealth + " " + pokeNode.aiHealth);
+                            System.out.println(pokeNode.level);
+                        }
                     }
                 }
             } else {

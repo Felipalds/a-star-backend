@@ -106,7 +106,6 @@ public class Pokemon {
     }
 @JsonIgnore
     public Pokemon(String name) {
-        System.out.println("Normal Request");
         String urlString = "https://pokeapi.co/api/v2/pokemon/" + name;
         URL url = null;
         try {
