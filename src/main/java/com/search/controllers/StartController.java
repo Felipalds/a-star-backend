@@ -1,12 +1,11 @@
 package com.search.controllers;
 
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import com.fasterxml.jackson.databind.util.JSONWrappedObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.search.Server;
 import com.search.pokejava.Battle;
-import com.search.pokejava.Move;
 import com.search.pokejava.Pokemon;
-import org.apache.tomcat.util.json.JSONParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,23 +14,32 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@CrossOrigin(origins = "*")
 public class StartController {
 
-    @CrossOrigin(origins = "http://10.81.70.117:5173")
+    private static final Logger logger = LoggerFactory.getLogger(Server.class);
+
     @PostMapping(value = "/start", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Battle.PokeStatus>> start(@RequestBody Map<String, Object> payload) {
         Pokemon userPokemon, aiPokemon;
-        userPokemon = new Pokemon((String) payload.get("userPokemon"));
-        aiPokemon = new Pokemon((String) payload.get("aiPokemon"));
-        Battle battle = new Battle(userPokemon, aiPokemon);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            userPokemon = mapper.convertValue(payload.get("userPokemon"), Pokemon.class);
+            aiPokemon = mapper.convertValue(payload.get("aiPokemon"), Pokemon.class);
+        } catch (Exception exception) {
+            System.out.println("Error during conversion of pokemon objects /start.");
+            logger.error(exception.toString());
+            Map<String, Battle.PokeStatus> map = new HashMap<>();
+            map.put("Error during conversion of pokemon objects /start.", null);
+            return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
+        }
         Map<String, Battle.PokeStatus> map = new HashMap<>();
-        map.put("userPokemon", battle.statusA);
-        map.put("aiPokemon", battle.statusB);
+        map.put("userPokemon", new Battle.PokeStatus(userPokemon));
+        map.put("aiPokemon", new Battle.PokeStatus(aiPokemon));
         return new ResponseEntity<>(map, HttpStatus.OK);
     }
 }

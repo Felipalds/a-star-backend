@@ -1,10 +1,12 @@
 package com.search.pokejava;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.search.controllers.LoadController;
 import com.search.pokejava.types.PokeType;
 import org.apache.tomcat.util.json.JSONParser;
 
@@ -21,11 +23,62 @@ import java.util.Map;
 
 public class Pokemon {
 
-    public final Move[] moves = new Move[4];
+    public Move[] getMoves() {
+        return moves;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getImageFront() {
+        return imageFront;
+    }
+
+    public String getImageBack() {
+        return imageBack;
+    }
+
+    public float getHealth() {
+        return health;
+    }
+
+    public float getAttack() {
+        return attack;
+    }
+
+    public float getSpecialAttack() {
+        return specialAttack;
+    }
+
+    public float getDefense() {
+        return defense;
+    }
+
+    public float getSpecialDefense() {
+        return specialDefense;
+    }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public PokeType getType() {
+        return type;
+    }
+
+    public PokeType getSecondType() {
+        return secondType;
+    }
+
+    public Move[] moves = new Move[4];
     public String name, imageFront, imageBack;
     public float health, attack, specialAttack, defense, specialDefense, speed;
     public PokeType type, secondType;
 
+    public  Pokemon() {
+
+    }
     public Pokemon(Pokemon pokemon) {
         if (pokemon.moves[0] != null) {
             this.moves[0] = new Move(pokemon.moves[0]);
@@ -51,8 +104,9 @@ public class Pokemon {
         this.imageBack = pokemon.imageBack;
         this.secondType = pokemon.secondType;
     }
-
+@JsonIgnore
     public Pokemon(String name) {
+        System.out.println("Normal Request");
         String urlString = "https://pokeapi.co/api/v2/pokemon/" + name;
         URL url = null;
         try {
@@ -100,6 +154,10 @@ public class Pokemon {
         char[] nameChars = name.toCharArray();
         nameChars[0] = Character.toUpperCase(nameChars[0]);
         this.name = new String(nameChars);
+    }
+
+    public void setMoves(Move ...moves) {
+        System.arraycopy(moves, 0, this.moves, 0, moves.length);
     }
 
 }

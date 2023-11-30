@@ -1,5 +1,6 @@
 package com.search.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.pokejava.Battle;
 import com.search.pokejava.Pokemon;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 @RestController
+@CrossOrigin(origins = "*")
 public class RoundController {
     private static class RoundResponse {
 
@@ -41,12 +43,8 @@ public class RoundController {
             this.ended = ended;
         }
 
-        public void setLogsUser(ArrayList<String> logsUser) {
-            this.logsUser = logsUser;
-        }
-
-        public void setLogsAI(ArrayList<String> logsAI) {
-            this.logsAI = logsAI;
+        public void setLogs(ArrayList<String> logs) {
+            this.logs = logs;
         }
 
         public void setFirst(String first) {
@@ -65,12 +63,8 @@ public class RoundController {
             return ended;
         }
 
-        public ArrayList<String> getLogsUser() {
-            return logsUser;
-        }
-
-        public ArrayList<String> getLogsAI() {
-            return logsAI;
+        public ArrayList<String> getLogs() {
+            return logs;
         }
 
         public String getFirst() {
@@ -89,31 +83,45 @@ public class RoundController {
         private int turn;
         private String aiMove;
         private boolean ended;
-        private ArrayList<String> logsUser, logsAI;
+        private ArrayList<String> logs;
         private String first;
 
     }
 
-    @CrossOrigin(origins = "http://10.81.70.117:5173")
+
 
     @PostMapping(value = "/round", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<RoundResponse> round(@RequestBody Map<String, Object> payload) {
-        Battle.PokeStatus statusUser = (Battle.PokeStatus) payload.get("statusUser");
-        Battle.PokeStatus statusAI = (Battle.PokeStatus) payload.get("statusAI");
+        ObjectMapper mapper = new ObjectMapper();
         int userMove = (int) payload.get("userMove");
-        Battle battle = new Battle(new Pokemon(statusUser.name.toLowerCase()), new Pokemon(statusAI.name.toLowerCase()));
-        battle.statusA = statusUser;
-        battle.statusB = statusAI;
+        Pokemon userPokemon = mapper.convertValue(payload.get("userPokemon"), Pokemon.class);
+        Pokemon aiPokemon = mapper.convertValue(payload.get("aiPokemon"), Pokemon.class);
+        System.out.println(userPokemon.moves[0]);
+        System.out.println(aiPokemon.moves[0]);
+        Battle.PokeStatus userStatus = mapper.convertValue(payload.get("userStatus"), Battle.PokeStatus.class);
+        Battle.PokeStatus aiStatus = mapper.convertValue(payload.get("aiStatus"), Battle.PokeStatus.class);
+
+        Battle battle = new Battle(userPokemon, aiPokemon);
+        battle.statusA = userStatus;
+        battle.statusB = aiStatus;
+
         Battle newTurn = battle.makeTurn(userMove, 0);
         RoundResponse response = new RoundResponse();
-        response.setEnded(false);
-        response.setFirst(statusUser.name);
-        response.setLogsAI(new ArrayList<>());
-        response.setLogsUser(new ArrayList<>());
-        response.setTurn(3);
+        response.setEnded(newTurn.ended);
+        if (userPokemon.moves[userMove].priority > aiPokemon.moves[0].priority) {
+            response.setFirst(userPokemon.name);
+        } else if (userPokemon.moves[userMove].priority < aiPokemon.moves[0].priority) {
+            response.setFirst(aiPokemon.name);
+        } else if (userPokemon.speed >= aiPokemon.speed) {
+            response.setFirst(userPokemon.name);
+        } else {
+            response.setFirst(aiPokemon.name);
+        }
+        response.setLogs(newTurn.getLogs());
+        response.setTurn(newTurn.turn);
         response.setStatusAI(newTurn.statusB);
         response.setStatusUser(newTurn.statusA);
-        response.setAiMove(newTurn.pokemonB.moves[0].name);
+        response.setAiMove(aiPokemon.moves[0].name);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

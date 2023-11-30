@@ -2,8 +2,6 @@ package com.search.controllers;
 
 import com.search.pokejava.Move;
 import com.search.pokejava.Pokemon;
-import com.search.pokejava.types.DamageType;
-import com.search.pokejava.types.PokeType;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,165 +10,52 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 
 @RestController
+@CrossOrigin(origins = "*")
 public class LoadController {
 
     private static class LoadJson {
-        private final ArrayList<LoadPokemon> pokemons = new ArrayList<>();
-        public ArrayList<LoadPokemon> getPokemons() {
+        private final ArrayList<Pokemon> pokemons = new ArrayList<>();
+        public ArrayList<Pokemon> getPokemons() {
             return pokemons;
         }
 
     }
 
-    private static class LoadPokemon {
-
-        private String name, type, secondType;
-        private final ArrayList<String> sprites = new ArrayList<>();
-        private final ArrayList<LoadMove> moves = new ArrayList<>();
-
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public ArrayList<String> getSprites() {
-            return sprites;
-        }
-
-        public String getType() {
-            return type;
-        }
-
-
-        public ArrayList<LoadMove> getMoves() {
-            return moves;
-        }
-
-        public String getSecondType() {
-            return secondType;
-        }
-
-        public void setSecondType(String secondType) {
-            this.secondType = secondType;
-        }
-    }
-
-    private static class LoadMove {
-        private String name, description;
-        private PokeType pokeType;
-        private DamageType damageType;
-        private int power;
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public void setPower(int power) {
-            this.power = power;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public int getPower() {
-            return power;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public void setDescription(String description) {
-            this.description = description;
-        }
-
-        public PokeType getPokeType() {
-            return pokeType;
-        }
-
-        public void setPokeType(PokeType pokeType) {
-            this.pokeType = pokeType;
-        }
-
-        public DamageType getDamageType() {
-            return damageType;
-        }
-
-        public void setDamageType(DamageType damageType) {
-            this.damageType = damageType;
-        }
-
-    }
-
-    private static LoadPokemon PokemonToLoad(Pokemon pokemon) {
-        LoadPokemon loadPokemon = new LoadPokemon();
-        loadPokemon.setName(pokemon.name);
-        loadPokemon.setType(pokemon.type.toString());
-        if (loadPokemon.secondType == null) {
-            loadPokemon.setSecondType(null);
-        } else {
-            loadPokemon.setSecondType(pokemon.secondType.toString());
-        }
-        loadPokemon.sprites.add(pokemon.imageFront);
-        loadPokemon.sprites.add(pokemon.imageBack);
-        return loadPokemon;
-    }
-
-    private static LoadMove MoveToLoad(Move move) {
-        LoadMove loadMove = new LoadMove();
-        loadMove.setName(move.name);
-        loadMove.setPower((int) move.power);
-        loadMove.setDescription(move.description);
-        loadMove.setPokeType(move.pokeType);
-        loadMove.setDamageType(move.damageType);
-        return loadMove;
-    }
-    @CrossOrigin(origins = "http://10.81.70.117:5173")
     @GetMapping(value = "/load", produces = MediaType.APPLICATION_JSON_VALUE)
     private LoadJson load() {
         LoadJson startJson = new LoadJson();
-        LoadMove tackle = MoveToLoad(new Move("tackle"));
-        LoadMove thunderShock = MoveToLoad(new Move("thunder-shock"));
-        LoadMove ember = MoveToLoad(new Move("ember"));
-        LoadMove earthquake = MoveToLoad(new Move("earthquake"));
-        LoadMove sharpen = MoveToLoad(new Move("sharpen"));
+        Move tackle = new Move("tackle");
+        Move thunderShock = new Move("thunder-shock");
+        Move sharpen = new Move("sharpen");
+        Move quickAttack = new Move("quick-attack");
+        Move harden = new Move("harden");
+        Move megaPunch = new Move("mega-punch");
+        Move earthquake = new Move("earthquake");
+//        Move bubbles = new Move("bubbles");
         // Pikachu
-        LoadPokemon pikachu = PokemonToLoad(new Pokemon("pikachu"));
-        pikachu.moves.add(thunderShock);
-        pikachu.moves.add(tackle);
+        Pokemon pikachu = new Pokemon("pikachu");
+        pikachu.setMoves(tackle, thunderShock);
         startJson.pokemons.add(pikachu);
         // Bulbasaur
-        LoadPokemon bulbasaur = PokemonToLoad(new Pokemon("bulbasaur"));
-        bulbasaur.moves.add(tackle);
-//        bulbasaur.moves.add(MoveToLoad(new Move("quick-attack")));
+        Pokemon bulbasaur = new Pokemon("bulbasaur");
+        bulbasaur.setMoves(tackle, harden);
         startJson.pokemons.add(bulbasaur);
         // Squirtle
-        LoadPokemon squirtle = PokemonToLoad(new Pokemon("squirtle"));
-        squirtle.moves.add(tackle);
+        Pokemon squirtle = new Pokemon("squirtle");
+        squirtle.setMoves(tackle);
         startJson.pokemons.add(squirtle);
         // Charmander
-        LoadPokemon charmander = PokemonToLoad(new Pokemon("charmander"));
-        charmander.moves.add(tackle);
-        charmander.moves.add(ember);
-        charmander.moves.add(sharpen);
+        Pokemon charmander = new Pokemon("charmander");
+        charmander.setMoves(quickAttack, sharpen);
         startJson.pokemons.add(charmander);
         // Clefairy
-        LoadPokemon clefairy = PokemonToLoad(new Pokemon("clefairy"));
-        clefairy.moves.add(tackle);
+        Pokemon clefairy = new Pokemon("clefairy");
+        clefairy.setMoves(tackle, megaPunch);
         startJson.pokemons.add(clefairy);
         // Snorlax
-        LoadPokemon snorlax = PokemonToLoad(new Pokemon("snorlax"));
+        Pokemon snorlax = new Pokemon("snorlax");
+        snorlax.setMoves(earthquake, megaPunch);
         startJson.pokemons.add(snorlax);
-        snorlax.moves.add(earthquake);
         return startJson;
     }
 

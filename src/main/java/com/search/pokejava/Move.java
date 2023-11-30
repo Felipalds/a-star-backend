@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,21 +17,51 @@ import com.search.pokejava.types.DamageType;
 import com.search.pokejava.types.PokeType;
 
 public class Move {
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public float getPower() {
+        return power;
+    }
+
+    public DamageType getDamageType() {
+        return damageType;
+    }
+
+    public PokeType getPokeType() {
+        return pokeType;
+    }
+
     public String name, description;
     public int priority;
     public float power;
     public DamageType damageType;
     public PokeType pokeType;
-    public Effect effect;
 
+    public Move() {
+
+    }
     public Move(Move move) {
         this.name = move.name;
         this.priority = move.priority;
         this.power = move.power;
         this.damageType = move.damageType;
         this.pokeType = move.pokeType;
-        this.effect = move.effect;
         this.description = move.description;
+    }
+
+    @JsonIgnore
+    public Effect getEffect() {
+        return Effect.identifyEffect(this.name);
     }
 
     public Move(String name) {
@@ -80,9 +111,6 @@ public class Move {
         JsonNode effectNode = resultMap.get("effect_entries").get(0).get("effect");
         this.description = effectNode.asText();
 
-        // Effect
-        this.effect = Effect.identifyEffect(effectNode.asText());
-
         // Power
         this.power = resultMap.get("power").asInt();
 
@@ -97,4 +125,6 @@ public class Move {
         nameChars[0] = Character.toUpperCase(nameChars[0]);
         this.name = new String(nameChars);
     }
+
+    
 }
