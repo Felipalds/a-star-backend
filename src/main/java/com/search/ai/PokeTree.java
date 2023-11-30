@@ -20,19 +20,36 @@ public class PokeTree {
         public PokeNode parent;
         public ArrayList<PokeNode> children = new ArrayList<>();
         public int userMove, aiMove;
+        public float f;
         public PokeNode(Battle battle, int userMove, int aiMove) {
             this.userHealth = battle.statusA.health;
             this.aiHealth = battle.statusB.health;
             this.userMove = userMove;
             this.aiMove = aiMove;
             this.battle = battle;
+            this.setFValue();
+        }
+
+        private float calculateG() {
+            float damageDealt = userHealth - parent.userHealth;
+            float healthRecovered = parent.aiHealth - aiHealth;
+            return damageDealt + healthRecovered;
+        }
+
+        // Logic here is inverse: we use the highest value, so we have to subtract H from G in final calculations.
+        private float calculateH() {
+            return userHealth + (battle.pokemonB.health - aiHealth);
+        }
+
+        public void setFValue() {
+            f = parent != null ? calculateG() - calculateH() : 0f;
         }
 
         public void generateChildren() {
             if (children.isEmpty()) {
                 for (int userMove = 0; userMove < 4; userMove++) {
                     for (int aiMove = 0; aiMove < 4; aiMove++) {
-                        if (battle.pokemonA.moves[userMove] != null && battle.pokemonB.moves[aiMove] != null) {
+                        if (battle.pokemonA.moves[userMove] != null && battle.pokemonB.moves[aiMove] != null && !battle.ended) {
                             PokeNode pokeNode = new PokeNode(battle.makeTurn(userMove, aiMove), userMove, aiMove);
                             pokeNode.level = this.level + 1;
                             pokeNode.parent = this;
@@ -49,16 +66,7 @@ public class PokeTree {
         }
     }
 
-    private float calculateG(PokeNode childNode) {
-        float damageDealt = childNode.userHealth - childNode.parent.userHealth;
-        float healthRecovered = childNode.parent.aiHealth - childNode.aiHealth;
-        return damageDealt + healthRecovered;
-    }
 
-    // Logic here is inverse: we use the highest value, so we have to subtract H from G in final calculations.
-    private float calculateH(PokeNode childNode) {
-        return childNode.userHealth + (this.root.aiHealth - childNode.aiHealth);
-    }
 
     // F = G - H
     public PokeTree(Battle battle) {

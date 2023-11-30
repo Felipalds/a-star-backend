@@ -1,6 +1,7 @@
 package com.search.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.search.ai.AStar;
 import com.search.ai.AiType;
 import com.search.ai.BFS;
 import com.search.pokejava.Battle;
@@ -108,26 +109,30 @@ public class RoundController {
         battle.statusB = aiStatus;
 
         RoundResponse response = new RoundResponse();
+        int aiMove;
         if (aiType == AiType.BFS) {
             BFS bfs = new BFS(battle);
-            int aiMove = bfs.path.get(1).aiMove;
-            Battle newTurn = battle.makeTurn(userMove, aiMove);
-            response.setEnded(newTurn.ended);
-            if (userPokemon.moves[userMove].priority > aiPokemon.moves[0].priority) {
-                response.setFirst(userPokemon.name);
-            } else if (userPokemon.moves[userMove].priority < aiPokemon.moves[0].priority) {
-                response.setFirst(aiPokemon.name);
-            } else if (userPokemon.speed >= aiPokemon.speed) {
-                response.setFirst(userPokemon.name);
-            } else {
-                response.setFirst(aiPokemon.name);
-            }
-            response.setLogs(newTurn.getLogs());
-            response.setTurn(newTurn.turn);
-            response.setAiStatus(newTurn.statusB);
-            response.setUserStatus(newTurn.statusA);
-            response.setAiMove(aiPokemon.moves[0].name);
+            aiMove = bfs.path.get(1).aiMove;
+        } else {
+            AStar aStar = new AStar(battle);
+            aiMove = aStar.path.get(1).aiMove;
         }
+        Battle newTurn = battle.makeTurn(userMove, aiMove);
+        response.setEnded(newTurn.ended);
+        if (userPokemon.moves[userMove].priority > aiPokemon.moves[0].priority) {
+            response.setFirst(userPokemon.name);
+        } else if (userPokemon.moves[userMove].priority < aiPokemon.moves[0].priority) {
+            response.setFirst(aiPokemon.name);
+        } else if (userPokemon.speed >= aiPokemon.speed) {
+            response.setFirst(userPokemon.name);
+        } else {
+            response.setFirst(aiPokemon.name);
+        }
+        response.setLogs(newTurn.getLogs());
+        response.setTurn(newTurn.turn);
+        response.setAiStatus(newTurn.statusB);
+        response.setUserStatus(newTurn.statusA);
+        response.setAiMove(aiPokemon.moves[0].name);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

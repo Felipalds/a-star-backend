@@ -30,8 +30,8 @@ public class BFS {
         }
     }
     public BFS(Battle battle) {
-        PokeTree pokeTree = new PokeTree(battle);
         start = System.currentTimeMillis();
+        PokeTree pokeTree = new PokeTree(battle);
         if (pokeTree.root.userHealth <= 0f) {
             front = pokeTree.root;
             path.addFirst(front);
@@ -54,7 +54,7 @@ public class BFS {
         }
         finish = System.currentTimeMillis();
         timeElapsed = finish - start;
-        System.out.println("Finished: " + finished + " " + queue.isEmpty());
+        System.out.println("BFS terminou em: " + timeElapsed/60f + " segundos.");
     }
 
 }
