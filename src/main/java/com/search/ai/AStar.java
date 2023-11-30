@@ -41,7 +41,7 @@ public class AStar {
                     break;
                 }
                 boolean samePositionOpenLowerF = false;
-                for (PokeTree.PokeNode openNode : openList) {
+                for (PokeTree.PokeNode openNode : openList) { // Ver se tem alguem melhor na lista aberta, se sim, pula
                     if (openNode.level == child.level && openNode.f > child.f) {
                         samePositionOpenLowerF = true;
                         break;
@@ -49,8 +49,8 @@ public class AStar {
                 }
                 if (samePositionOpenLowerF) continue;
                 boolean samePositionClosedLowerF = false;
-                for (PokeTree.PokeNode openNode : openList) {
-                    if (openNode.level == child.level && openNode.f > child.f) {
+                for (PokeTree.PokeNode closedNode : closedList) { // Ver se tem alguem melhor na lista fechada, se sim pula
+                    if (closedNode.level == child.level && closedNode.f > child.f) {
                         samePositionClosedLowerF = true;
                         break;
                     }
