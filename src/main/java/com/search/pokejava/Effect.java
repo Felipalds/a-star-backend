@@ -113,7 +113,6 @@ public abstract class Effect {
         }
 
         battle.logs.add(target.name + " recebe " + damage + " de dano!");
-
         target.health -= damage;
         if (target.health <= 0f) {
             target.health = 0f;
@@ -127,46 +126,91 @@ public abstract class Effect {
 
     public static Effect identifyEffect(String moveName) {
         moveName = moveName.toLowerCase();
-        return switch (moveName) {
-            case "recover" -> new Effect() {
+        if (moveName.equals("recover")) {
+            return new Effect() {
                 @Override
                 void apply(Battle battle, Battle.PokeStatus attacker, Battle.PokeStatus target, Move move) {
-                    attacker.health += battle.pokemonA.health * 0.5f;
-                    if (attacker.health > battle.pokemonA.health) {
-                        attacker.health = battle.pokemonA.health;
+                    if (attacker.name.equalsIgnoreCase(battle.statusA.name)) {
+                        attacker.health += battle.pokemonA.health * 0.5f;
+                        if (attacker.health > battle.pokemonA.health) {
+                            attacker.health = battle.pokemonA.health;
+                        }
+                    } else {
+                        attacker.health += battle.pokemonB.health * 0.5f;
+                        if (attacker.health > battle.pokemonB.health) {
+                            attacker.health = battle.pokemonB.health;
+                        }
                     }
                 }
             };
-            case "harden" -> new Effect() {
+        } else if (moveName.equals("synthesis")) {
+            return new Effect() {
+                @Override
+                void apply(Battle battle, Battle.PokeStatus attacker, Battle.PokeStatus target, Move move) {
+                    if (attacker.name.equalsIgnoreCase(battle.statusA.name)) {
+                        attacker.health += battle.pokemonA.health * 0.33f;
+                        if (attacker.health > battle.pokemonA.health) {
+                            attacker.health = battle.pokemonA.health;
+                        }
+                    } else {
+                        attacker.health += battle.pokemonB.health * 0.33f;
+                        if (attacker.health > battle.pokemonB.health) {
+                            attacker.health = battle.pokemonB.health;
+                        }
+                    }
+                }
+            };
+        } else if (moveName.equals("growth")) {
+            return new Effect() {
+                @Override
+                void apply(Battle battle, Battle.PokeStatus attacker, Battle.PokeStatus target, Move move) {
+                    Effect.changeBuffStage(battle, attacker, 1, PokeStat.SPECIAL_ATTACK);
+                }
+            };
+        } else if (moveName.equals("swords-dance")) {
+            return new Effect() {
+                @Override
+                void apply(Battle battle, Battle.PokeStatus attacker, Battle.PokeStatus target, Move move) {
+                    Effect.changeBuffStage(battle, attacker, 2, PokeStat.ATTACK);
+                }
+            };
+        } else if (moveName.equals("harden")) {
+            return new Effect() {
                 @Override
                 void apply(Battle battle, Battle.PokeStatus attacker, Battle.PokeStatus target, Move move) {
                     Effect.changeBuffStage(battle, attacker, 1, PokeStat.DEFENSE);
                 }
             };
-            case "sharpen" -> new Effect() {
+        } else if (moveName.equals("sharpen")) {
+            return new Effect() {
                 @Override
                 void apply(Battle battle, Battle.PokeStatus attacker, Battle.PokeStatus target, Move move) {
                     Effect.changeBuffStage(battle, attacker, 1, PokeStat.ATTACK);
                 }
             };
-            case "agility" -> new Effect() {
+        } else if (moveName.equals("agility")) {
+            return new Effect() {
                 @Override
                 void apply(Battle battle, Battle.PokeStatus attacker, Battle.PokeStatus target, Move move) {
                     Effect.changeBuffStage(battle, attacker, 2, PokeStat.SPEED);
                 }
             };
-            case "growl" -> new Effect() {
+        } else if (moveName.equals("growl")) {
+            return new Effect() {
                 @Override
                 void apply(Battle battle, Battle.PokeStatus attacker, Battle.PokeStatus target, Move move) {
-                    Effect.changeBuffStage(battle, target, -1, PokeStat.ATTACK);
+                    target.attackStage -= 1;
+                    if (target.attackStage < -6) {
+                        target.attackStage = -6;
+                    }
                 }
             };
-            default -> new Effect() {
-                @Override
-                void apply(Battle battle, Battle.PokeStatus attacker, Battle.PokeStatus target, Move move) {
-                    Effect.regularDamage(battle, attacker, target, 1f, move);
-                }
-            };
+        }
+        return new Effect() {
+            @Override
+            void apply(Battle battle, Battle.PokeStatus attacker, Battle.PokeStatus target, Move move) {
+                Effect.regularDamage(battle, attacker, target, 1f, move);
+            }
         };
     }
     abstract void apply(Battle battle, Battle.PokeStatus attacker, Battle.PokeStatus target, Move move);

@@ -337,19 +337,19 @@ public class Battle {
         } else {
             if (pokemonA.speed >= pokemonB.speed) {
                 nextTurn.logs.add(pokemonA.getName() + " usou " + pokemonA.moves[moveA].name + "!");
-                pokemonA.moves[moveA].getEffect().apply(nextTurn, nextTurn.statusA, nextTurn.statusB, pokemonA.moves[moveA]);
+                nextTurn.pokemonA.moves[moveA].getEffect().apply(nextTurn, nextTurn.statusA, nextTurn.statusB, nextTurn.pokemonA.moves[moveA]);
                 if (!nextTurn.statusB.fainted) {
                     nextTurn.logs.add(pokemonB.getName() + " usou " + pokemonB.moves[moveB].name + "!");
-                    pokemonB.moves[moveB].getEffect().apply(nextTurn, nextTurn.statusB, nextTurn.statusA, pokemonB.moves[moveB]);
+                    nextTurn.pokemonB.moves[moveB].getEffect().apply(nextTurn, nextTurn.statusB, nextTurn.statusA, nextTurn.pokemonB.moves[moveB]);
                 } else {
                     nextTurn.logs.add("O pokemon " + pokemonB.getName() + " caiu!");
                 }
             } else {
                 nextTurn.logs.add(pokemonB.getName() + " usou " + pokemonB.moves[moveB].name + "!");
-                pokemonB.moves[moveB].getEffect().apply(nextTurn, nextTurn.statusB, nextTurn.statusA, pokemonB.moves[moveB]);
+                nextTurn.pokemonB.moves[moveB].getEffect().apply(nextTurn, nextTurn.statusB, nextTurn.statusA, nextTurn.pokemonB.moves[moveB]);
                 if (!nextTurn.statusA.fainted) {
                     nextTurn.logs.add(pokemonA.getName() + " usou " + pokemonA.moves[moveA].name + "!");
-                    pokemonA.moves[moveA].getEffect().apply(nextTurn, nextTurn.statusA, nextTurn.statusB, pokemonA.moves[moveA]);
+                    nextTurn.pokemonA.moves[moveA].getEffect().apply(nextTurn, nextTurn.statusA, nextTurn.statusB, nextTurn.pokemonA.moves[moveA]);
                 } else {
                     nextTurn.logs.add("O pokemon " + pokemonA.getName() + " caiu!");
                 }

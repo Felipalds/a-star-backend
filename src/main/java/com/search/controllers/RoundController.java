@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.search.ai.AStar;
 import com.search.ai.AiType;
 import com.search.ai.BFS;
+import com.search.ai.PokeTree;
 import com.search.pokejava.Battle;
 import com.search.pokejava.Pokemon;
 import jakarta.annotation.Nullable;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Random;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -109,13 +111,37 @@ public class RoundController {
         battle.statusB = aiStatus;
 
         RoundResponse response = new RoundResponse();
-        int aiMove;
+        int aiMove = -1;
         if (aiType == AiType.BFS) {
             BFS bfs = new BFS(battle);
-            aiMove = bfs.path.get(1).aiMove;
+            if (!bfs.stoppedToLost) {
+                aiMove = bfs.path.get(1).aiMove;
+                for (PokeTree.PokeNode node : bfs.path) {
+                    if (node.parent != null) {
+                        System.out.println("Usar: " + aiPokemon.moves[node.aiMove].name);
+                        System.out.println("Esperar: " + userPokemon.moves[node.userMove].name);
+                    }
+                }
+            } else {
+                System.out.println("BFS Falhou. Muitas derrotas encontradas: " + bfs.lostStates);
+            }
         } else {
             AStar aStar = new AStar(battle);
-            aiMove = aStar.path.get(1).aiMove;
+            if (!aStar.stoppedToLost) {
+                aiMove = aStar.path.get(1).aiMove;
+                for (PokeTree.PokeNode node : aStar.path) {
+                    if (node.parent != null) {
+                        System.out.println("Usar: " + aiPokemon.moves[node.aiMove].name);
+                        System.out.println("Esperar: " + userPokemon.moves[node.userMove].name);
+                    }
+                }
+            } else {
+                System.out.println("A* Falhou. Muitas derrotas encontradas: " + aStar.lostStates);
+            }
+        }
+        if (aiMove == -1) {
+            Random random = new Random();
+            aiMove = random.nextInt() % 4;
         }
         Battle newTurn = battle.makeTurn(userMove, aiMove);
         response.setEnded(newTurn.ended);

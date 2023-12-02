@@ -11,17 +11,20 @@ public class BFS {
     private final Queue<PokeTree.PokeNode> queue = new LinkedList<>();
     private PokeTree.PokeNode front;
     public ArrayList<PokeTree.PokeNode> path = new ArrayList<>();
-    public int iterations = 0;
+    public int lostStates = 0;
     public long start, finish, timeElapsed;
     private boolean finished = false;
+    public boolean stoppedToLost = false;
 
     private void traverse(PokeTree.PokeNode node) {
         if (node.children.isEmpty()) {
             node.generateChildren();
         }
         for (PokeTree.PokeNode child : node.children) {
-            iterations++;
             queue.add(child);
+            if (child.aiHealth <= 0f) {
+                lostStates++;
+            }
             if (child.userHealth <= 0f) {
                 finished = true;
                 front = child;
@@ -37,13 +40,17 @@ public class BFS {
             path.addFirst(front);
         } else {
             traverse(pokeTree.root);
-            while (!finished) {
+            while (!finished && lostStates < 300000) {
                 traverse(queue.remove());
                 if (queue.isEmpty()) {
                     break;
                 }
             }
-            if (front != null) {
+            if (lostStates >= 300000) {
+                this.stoppedToLost = true;
+                path = null;
+            }
+            if (front != null && path != null) {
                 path.addFirst(front);
                 PokeTree.PokeNode parent = front.parent;
                 while (parent != null) {
@@ -54,7 +61,7 @@ public class BFS {
         }
         finish = System.currentTimeMillis();
         timeElapsed = finish - start;
-        System.out.println("BFS terminou em: " + timeElapsed/60f + " segundos.");
+        System.out.println("BFS terminou em: " + timeElapsed/1000f + " segundos.");
     }
 
 }

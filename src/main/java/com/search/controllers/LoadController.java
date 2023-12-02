@@ -1,5 +1,9 @@
 package com.search.controllers;
 
+import com.search.ai.AStar;
+import com.search.ai.BFS;
+import com.search.ai.PokeTree;
+import com.search.pokejava.Battle;
 import com.search.pokejava.Move;
 import com.search.pokejava.Pokemon;
 import org.springframework.http.MediaType;
@@ -31,26 +35,34 @@ public class LoadController {
         Move harden = new Move("harden");
         Move megaPunch = new Move("mega-punch");
         Move earthquake = new Move("earthquake");
+        Move agility = new Move("agility");
+        Move growl = new Move("growl");
+        Move synthesis = new Move("synthesis");
+        Move bubble = new Move("bubble");
+        Move growth = new Move("growth");
+        Move scratch = new Move("scratch");
+        Move swordsDance = new Move("swords-dance");
+        Move recover = new Move("recover");
 //        Move bubbles = new Move("bubbles");
         // Pikachu
         Pokemon pikachu = new Pokemon("pikachu");
-        pikachu.setMoves(tackle, thunderShock);
+        pikachu.setMoves(tackle, thunderShock, agility, growl);
         startJson.pokemons.add(pikachu);
         // Bulbasaur
         Pokemon bulbasaur = new Pokemon("bulbasaur");
-        bulbasaur.setMoves(tackle, harden);
+        bulbasaur.setMoves(tackle, growth, growl, synthesis);
         startJson.pokemons.add(bulbasaur);
         // Squirtle
         Pokemon squirtle = new Pokemon("squirtle");
-        squirtle.setMoves(tackle);
+        squirtle.setMoves(tackle, bubble, growl, harden);
         startJson.pokemons.add(squirtle);
         // Charmander
         Pokemon charmander = new Pokemon("charmander");
-        charmander.setMoves(quickAttack, sharpen);
+        charmander.setMoves(quickAttack, sharpen, scratch, growl);
         startJson.pokemons.add(charmander);
         // Clefairy
         Pokemon clefairy = new Pokemon("clefairy");
-        clefairy.setMoves(tackle, megaPunch);
+        clefairy.setMoves(tackle, megaPunch, recover, swordsDance);
         startJson.pokemons.add(clefairy);
         // Snorlax
         Pokemon snorlax = new Pokemon("snorlax");

@@ -111,7 +111,7 @@ public class Pokemon {
         try {
             url = new URI(urlString).toURL();
         } catch (URISyntaxException | MalformedURLException exception) {
-            System.out.println("URL errada!");
+            System.out.println("Pokemon: Erro URL!");
             System.exit(1);
         }
         StringBuilder result = new StringBuilder();
@@ -123,7 +123,7 @@ public class Pokemon {
                 result.append(line);
             }
         } catch (IOException exception) {
-            System.out.println("Erro na requisição.");
+            System.out.println("Pokemon: Erro de IO.");
             System.exit(2);
         }
         ObjectMapper objectMapper = new ObjectMapper();
@@ -133,10 +133,10 @@ public class Pokemon {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        JsonNode typeNode = resultMap.get("types");
-        this.type = PokeUtils.determinePokeType(typeNode.get(0).get("type").get("name").asText());
-        if (typeNode.size() > 1) {
-            this.secondType = PokeUtils.determinePokeType(typeNode.get(1).get("type").get("name").asText());
+        JsonNode typesNode = resultMap.get("types");
+        this.type = PokeUtils.determinePokeType(typesNode.get(0).get("type").get("name").asText());
+        if (typesNode.size() > 1) {
+            this.secondType = PokeUtils.determinePokeType(typesNode.get(1).get("type").get("name").asText());
         }
 
         JsonNode statsNode = resultMap.get("stats");
@@ -147,8 +147,9 @@ public class Pokemon {
         this.specialDefense = statsNode.get(4).get("base_stat").asInt();
         this.speed = statsNode.get(5).get("base_stat").asInt();
 
-        this.imageBack = resultMap.get("sprites").get("back_default").asText();
-        this.imageFront = resultMap.get("sprites").get("front_default").asText();
+        JsonNode spritesNode = resultMap.get("sprites");
+        this.imageBack = spritesNode.get("back_default").asText();
+        this.imageFront = spritesNode.get("front_default").asText();
 
         char[] nameChars = name.toCharArray();
         nameChars[0] = Character.toUpperCase(nameChars[0]);

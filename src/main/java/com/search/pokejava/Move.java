@@ -70,7 +70,7 @@ public class Move {
         try {
             url = new URI(urlString).toURL();
         } catch (URISyntaxException | MalformedURLException exception) {
-            System.out.println("URL errada!");
+            System.out.println("Move: Erro de URL!");
             System.exit(1);
         }
         StringBuilder result = new StringBuilder();
@@ -82,7 +82,7 @@ public class Move {
                 result.append(line);
             }
         } catch (IOException exception) {
-            System.out.println("Erro na requisição.");
+            System.out.println("Move: Erro de IO.");
             System.exit(2);
         }
 
