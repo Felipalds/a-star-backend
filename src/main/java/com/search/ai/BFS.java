@@ -9,9 +9,9 @@ import java.util.Queue;
 public class BFS {
 
     private final Queue<PokeTree.PokeNode> queue = new LinkedList<>();
-    private PokeTree.PokeNode front;
+    private PokeTree.PokeNode goal, bestNode;
     public ArrayList<PokeTree.PokeNode> path = new ArrayList<>();
-    public int lostStates = 0;
+    public int iterations = 0;
     public long start, finish, timeElapsed;
     private boolean finished = false;
     public boolean stoppedToLost = false;
@@ -22,12 +22,13 @@ public class BFS {
         }
         for (PokeTree.PokeNode child : node.children) {
             queue.add(child);
-            if (child.aiHealth <= 0f) {
-                lostStates++;
+            if (bestNode == null || (child.userHealth < bestNode.userHealth)) {
+                bestNode = child;
             }
+            iterations++;
             if (child.userHealth <= 0f) {
                 finished = true;
-                front = child;
+                goal = child;
                 return;
             }
         }
@@ -36,32 +37,37 @@ public class BFS {
         start = System.currentTimeMillis();
         PokeTree pokeTree = new PokeTree(battle);
         if (pokeTree.root.userHealth <= 0f) {
-            front = pokeTree.root;
-            path.addFirst(front);
+            goal = pokeTree.root;
+            path.addFirst(goal);
         } else {
             traverse(pokeTree.root);
-            while (!finished && lostStates < 300000) {
+            while (!finished && (System.currentTimeMillis() - start) < 3000) {
                 traverse(queue.remove());
+                System.out.println(iterations);
                 if (queue.isEmpty()) {
                     break;
                 }
             }
-            if (lostStates >= 300000) {
-                this.stoppedToLost = true;
-                path = null;
+        }
+        if (goal == null || (System.currentTimeMillis() - start) >= 3000) {
+            System.out.println("BFS: Could not reach goal. Chose best Node encountered so far.");
+            this.stoppedToLost = true;
+            path.addFirst(bestNode);
+            PokeTree.PokeNode parent = bestNode.parent;
+            while (parent != null) {
+                path.addFirst(parent);
+                parent = parent.parent;
             }
-            if (front != null && path != null) {
-                path.addFirst(front);
-                PokeTree.PokeNode parent = front.parent;
-                while (parent != null) {
-                    path.addFirst(parent);
-                    parent = parent.parent;
-                }
+        } else if (goal != null) {
+            path.addFirst(goal);
+            PokeTree.PokeNode parent = bestNode.parent;
+            while (parent != null) {
+                path.addFirst(parent);
+                parent = parent.parent;
             }
         }
         finish = System.currentTimeMillis();
         timeElapsed = finish - start;
         System.out.println("BFS terminou em: " + timeElapsed/1000f + " segundos.");
     }
-
 }

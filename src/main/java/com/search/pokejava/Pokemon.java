@@ -154,6 +154,7 @@ public class Pokemon {
         char[] nameChars = name.toCharArray();
         nameChars[0] = Character.toUpperCase(nameChars[0]);
         this.name = new String(nameChars);
+        System.out.println("Carregou " + this.name);
     }
 
     public void setMoves(Move ...moves) {

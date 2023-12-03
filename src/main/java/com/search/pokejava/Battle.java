@@ -310,7 +310,6 @@ public class Battle {
         nextTurn.turn = this.turn + 1;
         nextTurn.statusA = new PokeStatus(statusA);
         nextTurn.statusB = new PokeStatus(statusB);
-        nextTurn.logs.add("=== Início do Turno [" + this.turn + "] ===");
         // Calculate result
         if (statusA.fainted || statusB.fainted) {
             nextTurn.logs.add("Tentativa de jogada. O jogo já acabou.");
@@ -335,7 +334,9 @@ public class Battle {
                 nextTurn.logs.add("O pokemon " + pokemonA.getName() + " caiu!");
             }
         } else {
-            if (pokemonA.speed >= pokemonB.speed) {
+            float actualSpeedA = pokemonA.speed*Math.max(2f, 2f + ((float) statusA.spDefenseStage))/Math.max(2f, 2f - ((float) statusA.spDefenseStage));
+            float actualSpeedB = pokemonB.speed*Math.max(2f, 2f + ((float) statusB.spDefenseStage))/Math.max(2f, 2f - ((float) statusB.spDefenseStage));
+            if (actualSpeedA >= actualSpeedB) {
                 nextTurn.logs.add(pokemonA.getName() + " usou " + pokemonA.moves[moveA].name + "!");
                 nextTurn.pokemonA.moves[moveA].getEffect().apply(nextTurn, nextTurn.statusA, nextTurn.statusB, nextTurn.pokemonA.moves[moveA]);
                 if (!nextTurn.statusB.fainted) {
@@ -355,15 +356,7 @@ public class Battle {
                 }
             }
         }
-        if (nextTurn.statusA.fainted || nextTurn.statusB.fainted) {
-            nextTurn.logs.add("A batalha encerra!");
-            if (nextTurn.statusA.fainted && !nextTurn.statusB.fainted) {
-                nextTurn.logs.add(pokemonB.getName() + " é vitorioso!");
-            } else if (!nextTurn.statusA.fainted) {
-                nextTurn.logs.add(pokemonA.getName() + " é vitorioso!");
-            } else {
-                nextTurn.logs.add("É um empate!");
-            }
+        if (nextTurn.statusA.health == 0f || nextTurn.statusB.health == 0f) {
             nextTurn.ended = true;
         }
         return nextTurn;

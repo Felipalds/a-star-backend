@@ -114,34 +114,21 @@ public class RoundController {
         int aiMove = -1;
         if (aiType == AiType.BFS) {
             BFS bfs = new BFS(battle);
-            if (!bfs.stoppedToLost) {
-                aiMove = bfs.path.get(1).aiMove;
-                for (PokeTree.PokeNode node : bfs.path) {
-                    if (node.parent != null) {
-                        System.out.println("Usar: " + aiPokemon.moves[node.aiMove].name);
-                        System.out.println("Esperar: " + userPokemon.moves[node.userMove].name);
-                    }
+            aiMove = bfs.path.get(1).aiMove;
+            for (PokeTree.PokeNode node : bfs.path) {
+                if (node.parent != null) {
+                    System.out.println("Usar: " + aiPokemon.moves[node.aiMove].name);
+                    System.out.println("Esperar: " + userPokemon.moves[node.userMove].name);
                 }
-            } else {
-                System.out.println("BFS Falhou. Muitas derrotas encontradas: " + bfs.lostStates);
             }
         } else {
             AStar aStar = new AStar(battle);
-            if (!aStar.stoppedToLost) {
-                aiMove = aStar.path.get(1).aiMove;
-                for (PokeTree.PokeNode node : aStar.path) {
-                    if (node.parent != null) {
-                        System.out.println("Usar: " + aiPokemon.moves[node.aiMove].name);
-                        System.out.println("Esperar: " + userPokemon.moves[node.userMove].name);
-                    }
+            aiMove = aStar.path.get(1).aiMove;
+            for (PokeTree.PokeNode node : aStar.path) {
+                if (node.parent != null) {
+                    System.out.println("Usar: " + aiPokemon.moves[node.aiMove].name + " Esperar: " + userPokemon.moves[node.userMove].name);
                 }
-            } else {
-                System.out.println("A* Falhou. Muitas derrotas encontradas: " + aStar.lostStates);
             }
-        }
-        if (aiMove == -1) {
-            Random random = new Random();
-            aiMove = random.nextInt() % 4;
         }
         Battle newTurn = battle.makeTurn(userMove, aiMove);
         response.setEnded(newTurn.ended);
@@ -158,7 +145,7 @@ public class RoundController {
         response.setTurn(newTurn.turn);
         response.setAiStatus(newTurn.statusB);
         response.setUserStatus(newTurn.statusA);
-        response.setAiMove(aiPokemon.moves[0].name);
+        response.setAiMove(aiPokemon.moves[aiMove].name);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

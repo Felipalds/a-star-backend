@@ -87,11 +87,11 @@ public abstract class Effect {
     private static void regularDamage(Battle battle, Battle.PokeStatus attacker, Battle.PokeStatus target, float moveMod, Move move) {
         float attack, defense;
         if (move.damageType == DamageType.PHYSICAL) {
-            attack = attacker.attack*Math.max(2f, 2f + ((float) attacker.attackStage))/Math.max(2f, 2f - attacker.attackStage);
-            defense = target.defense*Math.max(2f, 2f + ((float) target.defenseStage))/Math.max(2f, 2f - target.defenseStage);
+            attack = attacker.attack*Math.max(2f, 2f + ((float) attacker.attackStage))/Math.max(2f, 2f - ((float) attacker.attackStage));
+            defense = target.defense*Math.max(2f, 2f + ((float) target.defenseStage))/Math.max(2f, 2f - ((float) target.defenseStage));
         } else {
-            attack = attacker.specialAttack*Math.max(2f, 2f + ((float) attacker.spAttackStage))/Math.max(2f, 2f - attacker.spAttackStage);
-            defense = target.specialDefense*Math.max(2f, 2f + ((float) target.spDefenseStage))/Math.max(2f, 2f - target.spDefenseStage);
+            attack = attacker.specialAttack*Math.max(2f, 2f + ((float) attacker.spAttackStage))/Math.max(2f, 2f - ((float) attacker.spAttackStage));
+            defense = target.specialDefense*Math.max(2f, 2f + ((float) target.spDefenseStage))/Math.max(2f, 2f - ((float) target.spDefenseStage));
         }
         float stab = 1.0f;
         if (move.pokeType == attacker.pokeType || move.pokeType == attacker.secondPokeType) {
@@ -195,7 +195,31 @@ public abstract class Effect {
                     Effect.changeBuffStage(battle, attacker, 2, PokeStat.SPEED);
                 }
             };
-        } else if (moveName.equals("growl")) {
+        } else if (moveName.equals("calm-mind")) {
+            return new Effect() {
+                @Override
+                void apply(Battle battle, Battle.PokeStatus attacker, Battle.PokeStatus target, Move move) {
+                    Effect.changeBuffStage(battle, attacker, 2, PokeStat.SPECIAL_ATTACK);
+                }
+            };
+        } else if (moveName.equals("hammer-arm")) {
+            return new Effect() {
+                @Override
+                void apply(Battle battle, Battle.PokeStatus attacker, Battle.PokeStatus target, Move move) {
+                    Effect.changeBuffStage(battle, attacker, -1, PokeStat.SPEED);
+                    Effect.regularDamage(battle, attacker, target, 1, move);
+                }
+            };
+        } else if (moveName.equals("bulk-up")) {
+            return new Effect() {
+                @Override
+                void apply(Battle battle, Battle.PokeStatus attacker, Battle.PokeStatus target, Move move) {
+                    Effect.changeBuffStage(battle, attacker, 1, PokeStat.ATTACK);
+                    Effect.changeBuffStage(battle, attacker, 1, PokeStat.DEFENSE);
+                }
+            };
+        }
+        else if (moveName.equals("growl")) {
             return new Effect() {
                 @Override
                 void apply(Battle battle, Battle.PokeStatus attacker, Battle.PokeStatus target, Move move) {

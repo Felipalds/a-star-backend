@@ -2,6 +2,7 @@ package com.search.ai;
 
 import com.search.Server;
 import com.search.pokejava.Battle;
+import com.search.pokejava.PokeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,12 +31,12 @@ public class PokeTree {
         }
 
         private float calculateG() {
-            return (parent.userHealth - userHealth) + (parent.aiHealth - aiHealth);
+            return parent.userHealth - userHealth;
         }
 
         // Logic here is inverse: we use the highest value, so we have to subtract H from G in final calculations.
         private float calculateH() {
-            return userHealth + battle.pokemonB.health;
+            return userHealth;
         }
 
         public void setFValue() {
@@ -46,17 +47,23 @@ public class PokeTree {
 
         public void generateChildren() {
             if (children.isEmpty()) {
-                for (int userMove = 0; userMove < 4; userMove++) {
-                    for (int aiMove = 0; aiMove < 4; aiMove++) {
-                        if (battle.pokemonA.moves[userMove] != null && battle.pokemonB.moves[aiMove] != null && !battle.ended) {
-                            PokeNode pokeNode = new PokeNode(battle.makeTurn(userMove, aiMove), userMove, aiMove);
-                            pokeNode.level = this.level + 1;
-                            pokeNode.parent = this;
-                            children.add(pokeNode);
-//                            System.out.println(battle.pokemonA.moves[userMove].name + " " + battle.pokemonB.moves[aiMove].name);
-//                            System.out.println(pokeNode.userHealth + " " + pokeNode.aiHealth);
-//                            System.out.println(pokeNode.level);
+                int bestMove = -1;
+                float highestDamage = -1f;
+                for (int userI = 0; userI < 4; userI++) {
+                    if (battle.pokemonA.moves[userI] != null) {
+                        float damage = PokeUtils.calculateDamage(battle.statusA, battle.statusB, battle.pokemonA.moves[userI], 1f);
+                        if (damage > highestDamage || bestMove == -1) {
+                            bestMove = userI;
+                            highestDamage = damage;
                         }
+                    }
+                }
+                for (int aiI = 0; aiI < 4; aiI++) {
+                    if (battle.pokemonB.moves[aiI] != null && !battle.ended) {
+                        PokeNode pokeNode = new PokeNode(battle.makeTurn(bestMove, aiI), bestMove, aiI);
+                        pokeNode.level = this.level + 1;
+                        pokeNode.parent = this;
+                        children.add(pokeNode);
                     }
                 }
             } else {

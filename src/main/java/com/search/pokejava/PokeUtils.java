@@ -1,6 +1,8 @@
 package com.search.pokejava;
 
 import java.util.ArrayList;
+
+import com.search.pokejava.types.DamageType;
 import com.search.pokejava.types.PokeType;
 
 public class PokeUtils {
@@ -61,5 +63,24 @@ public class PokeUtils {
             pokeType = PokeType.STEEL;
         }
         return pokeType;
+    }
+
+    public static float calculateDamage(Battle.PokeStatus attacker, Battle.PokeStatus target, Move move, float moveMod) {
+        float attack, defense;
+        if (move.damageType == DamageType.PHYSICAL) {
+            attack = attacker.attack*Math.max(2f, 2f + ((float) attacker.attackStage))/Math.max(2f, 2f - attacker.attackStage);
+            defense = target.defense*Math.max(2f, 2f + ((float) target.defenseStage))/Math.max(2f, 2f - target.defenseStage);
+        } else {
+            attack = attacker.specialAttack*Math.max(2f, 2f + ((float) attacker.spAttackStage))/Math.max(2f, 2f - attacker.spAttackStage);
+            defense = target.specialDefense*Math.max(2f, 2f + ((float) target.spDefenseStage))/Math.max(2f, 2f - target.spDefenseStage);
+        }
+        float stab = 1.0f;
+        if (move.pokeType == attacker.pokeType || move.pokeType == attacker.secondPokeType) {
+            stab = 1.5f;
+        }
+        float typeEffectiveness = Battle.getTypeEffectiveness(move.pokeType, target.pokeType);
+        float typeEffectiveness2 = Battle.getTypeEffectiveness(move.pokeType, target.secondPokeType);
+        float totalEffectiveness = typeEffectiveness * typeEffectiveness2;
+        return (((2f+(2f/5f)) * move.power * (attack / defense)) / 50f + 2) * stab * totalEffectiveness * 1.125f * moveMod;
     }
 }
