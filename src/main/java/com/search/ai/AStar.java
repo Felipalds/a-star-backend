@@ -50,10 +50,6 @@ public class AStar {
         }
         if (goal == null) {
             System.out.println("A*: Could not reach goal. Chose best Node encountered so far.");
-            if (bestNode.aiMove == -1) {
-                System.out.println("Batalha ja man!???");
-                System.out.println("Best Node's Parent: " + bestNode.parent);
-            }
             this.stoppedToLost = true;
             path.addFirst(bestNode);
             PokeTree.PokeNode parent = bestNode.parent;

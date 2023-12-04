@@ -38,12 +38,10 @@ public class BFS {
         PokeTree pokeTree = new PokeTree(battle);
         if (pokeTree.root.userHealth <= 0f) {
             goal = pokeTree.root;
-            path.addFirst(goal);
         } else {
             traverse(pokeTree.root);
             while (!finished && (System.currentTimeMillis() - start) < 3000) {
                 traverse(queue.remove());
-                System.out.println(iterations);
                 if (queue.isEmpty()) {
                     break;
                 }
